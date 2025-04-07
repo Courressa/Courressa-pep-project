@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
+import java.util.List;
+
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -38,6 +40,7 @@ public class SocialMediaController {
         app.post("/register", this::postAccountHandler);
         app.post("/login", this::postLoggedInAccountHandler);
         app.post("/messages", this::postCreateMessageHandler);
+        app.get("/messages", this::getAllMessagesHandler);
         
         return app;
     }
@@ -87,6 +90,12 @@ public class SocialMediaController {
         } else {
             ctx.status(400);
         }
+    }
+
+    //Handler to get all messages
+    private void getAllMessagesHandler(Context ctx) {
+        List<Message> allMessages = messageService.getAllMessages();
+        ctx.json(allMessages).status(200);
     }
 
 }

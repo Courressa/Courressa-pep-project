@@ -4,6 +4,8 @@ import Model.Message;
 import Util.ConnectionUtil;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MessageDAO {
     //Create new messages in the message table
@@ -17,7 +19,7 @@ public class MessageDAO {
             preparedStatement.setInt(1, message.getPosted_by());
             preparedStatement.setString(2, message.getMessage_text());
             preparedStatement.setLong(3, message.getTime_posted_epoch());
-            
+
             preparedStatement.executeUpdate();
             ResultSet psKeyResultSet = preparedStatement.getGeneratedKeys();
 
@@ -33,5 +35,34 @@ public class MessageDAO {
 
         //Returns null if unable to create a new message
         return null;
+    }
+
+    //Get all messages in the message table
+    public List<Message> retrieveAllMessages() {
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> allMessages = new ArrayList<>();
+
+        try {
+            String sql = "SELECT * FROM message;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            ResultSet psResult = preparedStatement.executeQuery();
+
+            while (psResult.next()) {
+                Message message = new Message(
+                    psResult.getInt("message_id"),
+                    psResult.getInt("posted_by"),
+                    psResult.getString("message_text"),
+                    psResult.getLong("time_posted_epoch")
+                );
+
+                allMessages.add(message);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return allMessages;
     }
 }
