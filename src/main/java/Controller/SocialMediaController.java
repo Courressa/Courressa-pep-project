@@ -1,7 +1,9 @@
 package Controller;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +18,12 @@ import io.javalin.http.Context;
  */
 public class SocialMediaController {
     AccountService accountService;
+    MessageService messageService;
 
     //Constructor
     public SocialMediaController() {
         accountService = new AccountService();
+        messageService = new MessageService();
     }
 
     /**
@@ -32,7 +36,8 @@ public class SocialMediaController {
         app.get("example-endpoint", this::exampleHandler);
 
         app.post("/register", this::postAccountHandler);
-        app.post("/login", this::getLoggedInAccountHandler);
+        app.post("/login", this::postLoggedInAccountHandler);
+        app.post("/messages", this::postCreateMessageHandler);
         
         return app;
     }
@@ -59,7 +64,7 @@ public class SocialMediaController {
     }
 
     //Handler to verify user login and return account
-    private void getLoggedInAccountHandler(Context ctx) throws JsonProcessingException {
+    private void postLoggedInAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Account account = om.readValue(ctx.body(), Account.class);
         Account userAccount = accountService.verifyUser(account);
@@ -68,6 +73,19 @@ public class SocialMediaController {
             ctx.json(om.writeValueAsString(userAccount)).status(200);
         } else {
             ctx.status(401);
+        }
+    }
+
+    //Handler to create a new message
+    private void postCreateMessageHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        Message message = om.readValue(ctx.body(), Message.class);
+        Message addedMessage = messageService.createMessage(message);
+        
+        if (addedMessage != null) {
+            ctx.json(om.writeValueAsString(addedMessage)).status(200);
+        } else {
+            ctx.status(400);
         }
     }
 

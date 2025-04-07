@@ -66,6 +66,34 @@ public class AccountDAO {
         return null;
     }
 
-    //Verify user login
-   
+    //Gets user by id in the account table
+    public Account getAccountById(int id) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+            String sql = "SELECT account_id, username, password FROM account WHERE account_id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setInt(1, id);
+            
+            ResultSet psResult = preparedStatement.executeQuery();
+
+            while(psResult.next()) {
+                Account account = new Account (
+                    psResult.getInt("account_id"),
+                    psResult.getString("username"),
+                    psResult.getString("password")
+                );
+
+                return account;
+            }
+
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        //Returns null if id does not exist
+        return null;
+    }
 }
