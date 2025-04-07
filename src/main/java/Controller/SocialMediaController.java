@@ -17,7 +17,7 @@ import io.javalin.http.Context;
 public class SocialMediaController {
     AccountService accountService;
 
-    //constructor
+    //Constructor
     public SocialMediaController() {
         accountService = new AccountService();
     }
@@ -32,8 +32,8 @@ public class SocialMediaController {
         app.get("example-endpoint", this::exampleHandler);
 
         app.post("/register", this::postAccountHandler);
+        app.post("/login", this::getLoggedInAccountHandler);
         
-
         return app;
     }
 
@@ -45,7 +45,7 @@ public class SocialMediaController {
         context.json("sample text");
     }
 
-    //handler to post a new account
+    //Handler to post a new account
     private void postAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Account account = om.readValue(ctx.body(), Account.class);
@@ -55,6 +55,19 @@ public class SocialMediaController {
             ctx.json(om.writeValueAsString(addedAccount));
         } else {
             ctx.status(400);
+        }
+    }
+
+    //Handler to verify user login and return account
+    private void getLoggedInAccountHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        Account account = om.readValue(ctx.body(), Account.class);
+        Account userAccount = accountService.verifyUser(account);
+        
+        if (userAccount != null) {
+            ctx.json(om.writeValueAsString(userAccount)).status(200);
+        } else {
+            ctx.status(401);
         }
     }
 

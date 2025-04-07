@@ -7,7 +7,7 @@ import java.sql.*;
 
 
 public class AccountDAO {
-    //insert user account into the account table
+    //Inserts user account into the account table
     public Account insertAccount(Account account) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -31,16 +31,16 @@ public class AccountDAO {
             ex.printStackTrace();
         }
 
-        //returns null if unable to insert account
+        //Returns null if unable to insert account
         return null;
     }
 
-    //get user by username in the account table
+    //Gets user by username in the account table
     public Account getAccountByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
-            String sql = "SELECT username, password FROM account WHERE username = ?;";
+            String sql = "SELECT account_id, username, password FROM account WHERE username = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1, username);
@@ -49,6 +49,7 @@ public class AccountDAO {
 
             while(psResult.next()) {
                 Account account = new Account (
+                    psResult.getInt("account_id"),
                     psResult.getString("username"),
                     psResult.getString("password")
                 );
@@ -61,8 +62,10 @@ public class AccountDAO {
             ex.printStackTrace();
         }
 
-        //returns null if username does not exist
+        //Returns null if username does not exist
         return null;
     }
 
+    //Verify user login
+   
 }
