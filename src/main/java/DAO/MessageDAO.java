@@ -108,17 +108,16 @@ public class MessageDAO {
 
             preparedStatement.setInt(1, id);
             
-            ResultSet psResult = preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
+            ResultSet psKeyResultSet = preparedStatement.getGeneratedKeys();
 
-            while (psResult.next()) {
-                Message message = new Message(
-                    psResult.getInt("message_id"),
-                    psResult.getInt("posted_by"),
-                    psResult.getString("message_text"),
-                    psResult.getLong("time_posted_epoch")
-                );
-                
-                return message;
+            if (psKeyResultSet.next()) {
+                int generated_message_id = psKeyResultSet.getInt(1);
+                int generated_posted_by = psKeyResultSet.getInt("posted_by");
+                String generated_message_text = psKeyResultSet.getString("message_text");
+                Long generated_time_posted = psKeyResultSet.getLong("time_posted_epoch");
+
+                return new Message(generated_message_id, generated_posted_by, generated_message_text, generated_time_posted);
             }
             
             connection.close();
@@ -128,4 +127,6 @@ public class MessageDAO {
         
         return null;
     }
+
+    //Patch message by ID
 }
