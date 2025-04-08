@@ -12,7 +12,6 @@ import io.javalin.http.Context;
 
 import java.util.List;
 
-
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
  * found in readme.md as well as the test cases. You should
@@ -41,6 +40,7 @@ public class SocialMediaController {
         app.post("/login", this::postLoggedInAccountHandler);
         app.post("/messages", this::postCreateMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
+        app.get("/messages/{message_id}", this::getMessageByIdHandler);
         
         return app;
     }
@@ -98,4 +98,14 @@ public class SocialMediaController {
         ctx.json(allMessages).status(200);
     }
 
+    //Handler to get message by ID
+    private void getMessageByIdHandler(Context ctx) {
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message retrievedMessage = messageService.getMessageByID(message_id);
+        if (retrievedMessage != null) {
+            ctx.json(retrievedMessage).status(200);
+        } else {
+            ctx.json("").status(200);
+        }
+    }
 }
