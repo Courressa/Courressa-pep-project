@@ -61,7 +61,7 @@ public class MessageDAO {
             
             connection.close();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         
         return allMessages;
@@ -92,7 +92,7 @@ public class MessageDAO {
             
             connection.close();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         
         return null;
@@ -104,7 +104,7 @@ public class MessageDAO {
 
         try {
             String sql = "DELETE FROM message WHERE message_id = ?;";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setInt(1, id);
             
@@ -116,17 +116,40 @@ public class MessageDAO {
                 int generated_posted_by = psKeyResultSet.getInt("posted_by");
                 String generated_message_text = psKeyResultSet.getString("message_text");
                 Long generated_time_posted = psKeyResultSet.getLong("time_posted_epoch");
-
+                
                 return new Message(generated_message_id, generated_posted_by, generated_message_text, generated_time_posted);
             }
             
             connection.close();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         
         return null;
     }
 
     //Patch message by ID
+    public boolean changeMessageTextById(int id, Message message) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, message.getMessage_text());
+            preparedStatement.setInt(2, id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                return true;
+            }
+            
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        return false;
+    }
 }

@@ -45,4 +45,22 @@ public class MessageService {
     public Message deleteMessageByID(int id) {
         return messageDAO.deleteMessageById(id);
     }
+
+    //Change message by ID
+    public Message changeMessageByID(int id, Message message) {
+        Message messageCheck = messageDAO.retrieveMessageById(id);
+
+        //Checks if the message id already exists and the new message_text is not blank and is not over 255 characters.
+        if ((messageCheck != null) && (message.message_text.length() > 0) && (message.message_text.length() <= 255)) {
+            boolean changedMessageCheck = messageDAO.changeMessageTextById(id, message);
+
+            //Checks if messasge was updated and retrieves the updated message information
+            if (changedMessageCheck) {
+                return messageDAO.retrieveMessageById(id);
+            }
+            
+        }
+
+        return null;
+    }
 }
