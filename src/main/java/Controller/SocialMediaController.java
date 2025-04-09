@@ -43,6 +43,7 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::getDeleteMessageByIdHandler);
         app.patch("/messages/{message_id}", this::getChangeMessageByIdHandler);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByPosterIdHandler);
         
         return app;
     }
@@ -136,5 +137,12 @@ public class SocialMediaController {
         } else {
             ctx.status(400);
         }
+    }
+
+    //Handler to get all messages by poster ID
+    private void getAllMessagesByPosterIdHandler(Context ctx) {
+        int posterId = Integer.parseInt(ctx.pathParam("account_id"));
+        List<Message> allMessages = messageService.getAllMessagesByPosterId(posterId);
+        ctx.json(allMessages).status(200);
     }
 }

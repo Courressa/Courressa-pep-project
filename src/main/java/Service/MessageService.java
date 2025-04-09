@@ -63,4 +63,9 @@ public class MessageService {
 
         return null;
     }
+
+    //Retrieve all messages by poster ID (who the message was posted by)
+    public List<Message> getAllMessagesByPosterId(int id) {
+        return messageDAO.retrieveAllMessagesByPosterId(id);
+    }
 }

@@ -67,7 +67,7 @@ public class MessageDAO {
         return allMessages;
     }
 
-    //Get message by ID
+    //Get message by ID in the message table
     public Message retrieveMessageById(int id) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -98,7 +98,7 @@ public class MessageDAO {
         return null;
     }
 
-    //Delete message by ID
+    //Delete message by ID in the message table
     public Message deleteMessageById(int id) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -128,7 +128,7 @@ public class MessageDAO {
         return null;
     }
 
-    //Patch message by ID
+    //Patch message by ID in the message table
     public boolean changeMessageTextById(int id, Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
@@ -151,5 +151,37 @@ public class MessageDAO {
         }
         
         return false;
+    }
+
+    //Get all messages by account it was posted by in the message table
+    public List<Message> retrieveAllMessagesByPosterId(int id) {
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> allMessagesByPoster = new ArrayList<>();
+
+        try {
+            String sql = "SELECT * FROM message WHERE posted_by = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setInt(1, id);
+
+            ResultSet psResult = preparedStatement.executeQuery();
+
+            while (psResult.next()) {
+                Message message = new Message(
+                    psResult.getInt("message_id"),
+                    psResult.getInt("posted_by"),
+                    psResult.getString("message_text"),
+                    psResult.getLong("time_posted_epoch")
+                );
+
+                allMessagesByPoster.add(message);
+            }
+            
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        return allMessagesByPoster;
     }
 }
